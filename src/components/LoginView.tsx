@@ -180,7 +180,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               </button>
 
               {/* Preset 2: Specialist (Vinoth) */}
-              <button
+              {/* <button
                 type="button"
                 onClick={() => handleSelectPreset('vinoth@leadmaster.com', 'Password@123')}
                 className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer group ${
@@ -210,7 +210,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                   <code className="text-slate-300">Password@123</code>
                   <span className="text-[9px] text-orange-400 ml-auto font-medium">Use ↗</span>
                 </div>
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
