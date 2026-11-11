@@ -115,40 +115,7 @@ export default function App() {
   // Modals
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
   const [isManagersModalOpen, setIsManagersModalOpen] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [toastMessage, setToastMessage] = useState<{ text: string; type?: 'info' | 'success' } | null>(null);
-
-  // Generate 10 Leads
-  const handleGenerateLeads = async () => {
-    setIsGenerating(true);
-    try {
-      const res = await fetch('/api/leads/generate', { method: 'POST' });
-      if (res.ok) {
-        const data = await res.json();
-        await fetchLeads();
-
-        if (currentUser?.userRole !== 'admin') {
-          const myLeadsCount = (data.leads || []).filter(
-            (l: Lead) => l.manager?.toLowerCase() === currentUser?.name?.toLowerCase()
-          ).length;
-          setToastMessage({
-            text: `Generated 10 enterprise leads! AI assigned ${myLeadsCount} to you (${currentUser?.name}) based on your specialties. The other ${10 - myLeadsCount} were routed to matching team specialists.`,
-            type: 'success',
-          });
-        } else {
-          setToastMessage({
-            text: 'Successfully generated and AI-dispatched 10 enterprise leads across the team!',
-            type: 'success',
-          });
-        }
-        setTimeout(() => setToastMessage(null), 6000);
-      }
-    } catch (err) {
-      console.error('Failed to generate leads:', err);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   // Fetch leads from API (user-scoped for specialists/members)
   const fetchLeads = useCallback(async () => {
@@ -488,8 +455,6 @@ export default function App() {
           }}
           onOpenManagersModal={() => setIsManagersModalOpen(true)}
           activeView={activeTab}
-          onGenerateLeads={handleGenerateLeads}
-          isGenerating={isGenerating}
           currentUser={currentUser}
           onLogout={handleLogout}
         />
@@ -553,8 +518,6 @@ export default function App() {
               viewMode={viewMode}
               onViewModeChange={(mode) => setViewMode(mode)}
               onExport={handleExport}
-              onGenerateLeads={handleGenerateLeads}
-              isGenerating={isGenerating}
             />
 
             {/* Main Data Table */}
@@ -566,8 +529,6 @@ export default function App() {
                 onSelectAll={handleSelectAll}
                 onLeadClick={(lead) => setActiveLead(lead)}
                 onDeleteLead={handleDeleteLead}
-                onGenerateLeads={handleGenerateLeads}
-                isGenerating={isGenerating}
               />
             </div>
 

@@ -31,8 +31,6 @@ interface HeaderProps {
   onSelectLead?: (lead: Lead) => void;
   onOpenManagersModal?: () => void;
   activeView: 'dashboard' | 'leads' | 'users';
-  onGenerateLeads?: () => void;
-  isGenerating?: boolean;
   currentUser?: Manager | null;
   onLogout?: () => void;
 }
@@ -56,8 +54,6 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectLead,
   onOpenManagersModal,
   activeView,
-  onGenerateLeads,
-  isGenerating,
   currentUser,
   onLogout,
 }) => {
@@ -234,19 +230,6 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right: Actions */}
       <div className="flex items-center gap-3">
-        {/* Generate 10 Leads Action */}
-        {onGenerateLeads && (
-          <button
-            onClick={onGenerateLeads}
-            disabled={isGenerating}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-orange-50 hover:bg-orange-100 text-[#ff6937] border border-orange-200/80 rounded-lg transition-all disabled:opacity-50"
-            title="Generate 10 random enterprise test leads"
-          >
-            <Sparkles className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
-            <span>{isGenerating ? 'Generating...' : 'Generate 10 Leads'}</span>
-          </button>
-        )}
-
         {/* Embed Widget Snippet Button */}
         <button
           onClick={() => setIsSnippetModalOpen(true)}

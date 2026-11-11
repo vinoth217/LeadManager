@@ -10,7 +10,6 @@ import {
   LayoutGrid,
   UploadCloud,
   DownloadCloud,
-  Sparkles,
 } from 'lucide-react';
 
 interface ToolbarProps {
@@ -19,8 +18,6 @@ interface ToolbarProps {
   viewMode: 'list' | 'grid';
   onViewModeChange: (mode: 'list' | 'grid') => void;
   onExport: () => void;
-  onGenerateLeads: () => void;
-  isGenerating?: boolean;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -29,8 +26,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   viewMode,
   onViewModeChange,
   onExport,
-  onGenerateLeads,
-  isGenerating,
 }) => {
   return (
     <div className="px-8 py-3.5 bg-white border-b border-[#ebeef2] flex items-center justify-between gap-4">
@@ -60,7 +55,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </button>
       </div>
 
-      {/* Right: View toggles, Import/Export, and Generate 10 Leads Button */}
+      {/* Right: View toggles, Import/Export */}
       <div className="flex items-center gap-2.5">
         <div className="flex items-center border border-slate-200/80 rounded-lg p-0.5 bg-[#f8fafc]">
           <button
@@ -97,17 +92,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <DownloadCloud className="w-3.5 h-3.5 text-slate-400" />
           <span>Export</span>
         </button>
-
-        {/* Generate 10 Leads Button */}
-        {/* <button
-          onClick={onGenerateLeads}
-          disabled={isGenerating}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#ff6937] hover:bg-[#ea580c] text-white rounded-lg text-xs font-semibold shadow-2xs transition-all disabled:opacity-50"
-          title="Instantly generate 10 realistic enterprise leads"
-        >
-          <Sparkles className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
-          <span>{isGenerating ? 'Generating...' : 'Generate 10 Leads'}</span>
-        </button> */}
       </div>
     </div>
   );
