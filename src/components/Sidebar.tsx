@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   LayoutDashboard,
   UserCheck,
@@ -8,6 +9,8 @@ import {
   Shield,
   ShieldAlert,
   LogOut,
+  MessageSquareCode,
+  ExternalLink,
 } from 'lucide-react';
 import { Manager, UserSystemRole } from '@/types';
 
@@ -128,6 +131,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             )}
           </nav>
+        </div>
+
+        {/* Lead Capture Widget & Snippet Section */}
+        <div className="px-4 py-2 border-t border-[#ebeef2]">
+          <div className="text-[10px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-2 flex items-center justify-between">
+            <span>Lead Capture</span>
+            <span className="text-[9px] text-[#6C47FF] font-semibold uppercase tracking-wider bg-purple-50 px-1.5 py-0.5 rounded">
+              Widget
+            </span>
+          </div>
+          <Link
+            href="/contact-us"
+            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-slate-600 hover:bg-purple-50/60 hover:text-[#6C47FF] group"
+          >
+            <div className="flex items-center gap-3">
+              <MessageSquareCode className="w-4 h-4 text-[#6C47FF] group-hover:scale-110 transition-transform" />
+              <span>Chat Form & Snippet</span>
+            </div>
+            <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#6C47FF]" />
+          </Link>
         </div>
       </div>
 

@@ -19,8 +19,10 @@ import {
   Check,
   Trash2,
   Inbox,
+  Code2,
 } from 'lucide-react';
 import { Manager } from '@/types';
+import { EmbedSnippetModal } from './EmbedSnippetModal';
 
 interface HeaderProps {
   totalCount: number;
@@ -56,6 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isSnippetModalOpen, setIsSnippetModalOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>(DEFAULT_NOTIFICATIONS);
   const [notifFilter, setNotifFilter] = useState<'all' | 'unread'>('all');
 
@@ -162,14 +165,24 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
+        {/* Embed Widget Snippet Button */}
+        <button
+          onClick={() => setIsSnippetModalOpen(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-purple-50 hover:bg-purple-100 text-[#6C47FF] border border-purple-200/80 rounded-lg transition-all"
+          title="Get embeddable chat lead widget snippet code"
+        >
+          <Code2 className="w-3.5 h-3.5 text-[#6C47FF]" />
+          <span>Embed Snippet</span>
+        </button>
+
         {/* Open Website Contact Page */}
         <Link
           href="/contact-us"
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors border border-slate-200"
-          title="Visit impigertech.com/contact-us"
+          title="Visit Chat Lead Form Page"
         >
           <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-          <span>Website Form</span>
+          <span>Chat Lead Form</span>
         </Link>
 
         {/* Notification Popover Trigger */}
@@ -495,6 +508,12 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       </div>
+
+      {/* Embed Snippet Modal */}
+      <EmbedSnippetModal
+        isOpen={isSnippetModalOpen}
+        onClose={() => setIsSnippetModalOpen(false)}
+      />
     </header>
   );
 };

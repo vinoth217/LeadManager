@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>External Website - Lead Widget Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f1f5f9;
+      color: #334155;
+    }
+    header {
+      background: #ffffff;
+      padding: 20px 40px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hero {
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 40px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    h1 {
+      color: #0f172a;
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+    }
+    p {
+      color: #64748b;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    .btn-open {
+      margin-top: 24px;
+      padding: 12px 28px;
+      background: #6C47FF;
+      color: white;
+      border: none;
+      border-radius: 9999px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(108,71,255,0.35);
+    }
+    .snippet-box {
+      margin-top: 36px;
+      text-align: left;
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 20px;
+      border-radius: 12px;
+      font-family: monospace;
+      font-size: 13px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="font-weight: 700; font-size: 18px; color: #0f172a;">Sample Client Website</div>
+    <div style="font-size: 14px; color: #64748b;">Simulating an external website with the embedded snippet</div>
+  </header>
+
+  <div class="hero">
+    <h1>Experience the Embedded Lead Chat Widget</h1>
+    <p>
+      This mock external website demonstrates how the floating chat lead form works when embedded into any website, blog, or eCommerce platform.
+    </p>
+
+    <button class="btn-open" onclick="window.ImpigerLeadWidget && window.ImpigerLeadWidget.open()">
+      💬 Click Here to Trigger Chat Form
+    </button>
+
+    <div class="snippet-box">
+      &lt;!-- Copy &amp; paste this snippet before &lt;/body&gt; on any website --&gt;<br>
+      &lt;script src="http://localhost:3000/lead-widget.js"&gt;&lt;/script&gt;
+    </div>
+  </div>
+
+  <!-- Embed Code Snippet -->
+  <script src="/lead-widget.js" data-primary-color="#6C47FF" data-auto-open="false"></script>
+</body>
+</html>

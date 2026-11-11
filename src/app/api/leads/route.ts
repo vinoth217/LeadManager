@@ -3,6 +3,19 @@ import { db } from '@/lib/db';
 import { triageLeadWithAI } from '@/lib/gemini';
 import { Lead, LeadSource, LeadStatus } from '@/types';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const statusFilter = searchParams.get('status');
@@ -46,23 +59,27 @@ export async function GET(request: Request) {
   const stats = await db.getStats(!isAdmin && user ? user : undefined);
   const managers = await db.getManagers();
 
-  return NextResponse.json({
-    leads,
-    stats,
-    managers,
-  });
+  return NextResponse.json(
+    {
+      leads,
+      stats,
+      managers,
+    },
+    { headers: corsHeaders }
+  );
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const firstName = body.firstName || '';
-    const lastName = body.lastName || '';
-    const customer = body.customer || `${firstName} ${lastName}`.trim() || 'Anonymous Lead';
+    const rawName = (body.name || '').trim();
+    const firstName = body.firstName || (rawName ? rawName.split(' ')[0] : '');
+    const lastName = body.lastName || (rawName ? rawName.split(' ').slice(1).join(' ') : '');
+    const customer = body.customer || rawName || `${firstName} ${lastName}`.trim() || 'Anonymous Lead';
     const company = body.company || 'Direct Inquiry';
     const email = body.email || 'inquiry@example.com';
-    const phone = body.phone || '';
+    const phone = body.phone || body.phoneNumber || '';
     const focusArea = body.focusArea || 'Digital Transformation';
     const message = body.message || '';
     const source: LeadSource = body.source || 'Website';
@@ -117,13 +134,19 @@ export async function POST(request: Request) {
 
     await db.addLead(newLead);
 
-    return NextResponse.json({
-      success: true,
-      lead: newLead,
-      message: `Lead successfully triaged and assigned to ${aiResult.assignedManagerName}!`,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        lead: newLead,
+        message: `Lead successfully triaged and assigned to ${aiResult.assignedManagerName}!`,
+      },
+      { headers: corsHeaders }
+    );
   } catch (error) {
     console.error('Error creating lead:', error);
-    return NextResponse.json({ error: 'Failed to process lead intake' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to process lead intake' },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
