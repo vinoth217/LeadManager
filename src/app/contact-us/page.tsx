@@ -255,8 +255,9 @@ export default function ContactUsPage() {
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </button>
-                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                  Contact Form
+                <div className="flex items-center gap-2">
+                  <img src="/widget-logo.png" alt="Logo" className="h-5 w-auto object-contain" />
+                  <span className="text-xs font-bold text-slate-800">Impiger Technologies</span>
                 </div>
                 <button
                   type="button"
