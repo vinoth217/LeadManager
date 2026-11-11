@@ -8,6 +8,9 @@ interface SendTeamsOptions {
   customWebhookUrl?: string;
 }
 
+const DEFAULT_TEAMS_WEBHOOK =
+  'https://default68cd811a8b0e4ca0aec966b397983a.9d.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/14/workflows/25ea9899bafe4acd95925ebfd206ff36/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=l1DgFE7xTD2eUgbSm_rxFhv3AMAh9_0OIk-IPANGcf8';
+
 /**
  * Sends a rich Adaptive Card notification to a Microsoft Teams channel or group chat.
  * Uses the modern Microsoft Teams Power Automate / Workflows webhook format.
@@ -19,7 +22,8 @@ export async function sendTeamsLeadAlert(
 ): Promise<{ sent: boolean; reason?: string }> {
   const webhookUrl =
     options.customWebhookUrl?.trim() ||
-    process.env.TEAMS_WEBHOOK_URL?.trim();
+    process.env.TEAMS_WEBHOOK_URL?.trim() ||
+    DEFAULT_TEAMS_WEBHOOK;
 
   if (!webhookUrl) {
     // Gracefully skip if no Teams webhook URL is configured

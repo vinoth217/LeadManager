@@ -135,10 +135,12 @@ export async function POST(request: Request) {
 
     await db.addLead(newLead);
 
-    // Send instant notification to Microsoft Teams (non-blocking)
-    sendTeamsLeadAlert(newLead, 'NEW_LEAD').catch((err) =>
-      console.error('[TeamsAlert] Failed sending new lead notification:', err)
-    );
+    // Send instant notification to Microsoft Teams (awaited so Vercel serverless functions do not terminate early)
+    try {
+      await sendTeamsLeadAlert(newLead, 'NEW_LEAD');
+    } catch (err) {
+      console.error('[TeamsAlert] Failed sending new lead notification:', err);
+    }
 
     return NextResponse.json(
       {

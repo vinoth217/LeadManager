@@ -21,12 +21,14 @@ import {
   Inbox,
   Code2,
 } from 'lucide-react';
-import { Manager } from '@/types';
+import { Lead, Manager } from '@/types';
 import { EmbedSnippetModal } from './EmbedSnippetModal';
 
 interface HeaderProps {
   totalCount: number;
   managers: Manager[];
+  leads?: Lead[];
+  onSelectLead?: (lead: Lead) => void;
   onOpenManagersModal?: () => void;
   activeView: 'dashboard' | 'leads' | 'users';
   onGenerateLeads?: () => void;
@@ -42,6 +44,7 @@ interface NotificationItem {
   time: string;
   unread: boolean;
   type: 'ai' | 'lead' | 'meeting' | 'system';
+  leadRef?: Lead;
 }
 
 const DEFAULT_NOTIFICATIONS: NotificationItem[] = [];
@@ -49,6 +52,8 @@ const DEFAULT_NOTIFICATIONS: NotificationItem[] = [];
 export const Header: React.FC<HeaderProps> = ({
   totalCount,
   managers,
+  leads = [],
+  onSelectLead,
   onOpenManagersModal,
   activeView,
   onGenerateLeads,
@@ -61,6 +66,61 @@ export const Header: React.FC<HeaderProps> = ({
   const [isSnippetModalOpen, setIsSnippetModalOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>(DEFAULT_NOTIFICATIONS);
   const [notifFilter, setNotifFilter] = useState<'all' | 'unread'>('all');
+  const [readNotifIds, setReadNotifIds] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('lead_read_notifications');
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  // Dynamically generate real-time notification items whenever leads update
+  useEffect(() => {
+    if (!leads || leads.length === 0) {
+      setNotifications([]);
+      return;
+    }
+
+    const items: NotificationItem[] = leads.slice(0, 20).map((l) => {
+      let type: 'ai' | 'lead' | 'meeting' | 'system' = 'lead';
+      let title = `New Lead: ${l.customer}`;
+      let description = `${l.company} • Score ${l.score || 8}/10 • Assigned: ${l.manager || 'Unassigned'}`;
+
+      if (l.status === 'HOT') {
+        type = 'lead';
+        title = `🔥 Hot Lead: ${l.customer}`;
+      } else if (l.scheduledCall) {
+        type = 'meeting';
+        title = `📅 Call: ${l.customer}`;
+        description = `${l.scheduledCall.date} at ${l.scheduledCall.time} (${l.scheduledCall.type || 'Phone'})`;
+      } else if (l.aiInsights?.urgency === 'High' || l.aiInsights?.urgency === 'Critical') {
+        type = 'ai';
+        title = `⚡ High Urgency: ${l.customer}`;
+        description = `${l.company} • ${l.aiInsights.assignedReason || 'Immediate follow-up advised'}`;
+      } else if (l.status === 'QUALIFIED') {
+        type = 'system';
+        title = `✅ Qualified: ${l.customer}`;
+      }
+
+      const isRead = readNotifIds.includes(l.id);
+
+      return {
+        id: l.id,
+        title,
+        description,
+        time: l.created || 'Recent',
+        unread: !isRead,
+        type,
+        leadRef: l,
+      };
+    });
+
+    setNotifications(items);
+  }, [leads, readNotifIds]);
 
   const popoverRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -91,17 +151,39 @@ export const Header: React.FC<HeaderProps> = ({
       : notifications;
 
   const handleMarkAllRead = () => {
+    const allIds = notifications.map((n) => n.id);
+    const newRead = readNotifIds.concat(allIds.filter((id) => !readNotifIds.includes(id)));
+    setReadNotifIds(newRead);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lead_read_notifications', JSON.stringify(newRead));
+    }
     setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
   };
 
-  const handleToggleRead = (id: string) => {
+  const handleNotificationClick = (item: NotificationItem) => {
+    const newRead = readNotifIds.includes(item.id) ? readNotifIds : [...readNotifIds, item.id];
+    setReadNotifIds(newRead);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lead_read_notifications', JSON.stringify(newRead));
+    }
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, unread: !n.unread } : n))
+      prev.map((n) => (n.id === item.id ? { ...n, unread: false } : n))
     );
+
+    if (item.leadRef && onSelectLead) {
+      onSelectLead(item.leadRef);
+      setIsNotificationsOpen(false);
+    }
   };
 
   const handleClearNotifications = () => {
-    setNotifications([]);
+    const allIds = notifications.map((n) => n.id);
+    const newRead = readNotifIds.concat(allIds.filter((id) => !readNotifIds.includes(id)));
+    setReadNotifIds(newRead);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lead_read_notifications', JSON.stringify(newRead));
+    }
+    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
   };
 
   // Current active user or fallback default
@@ -262,7 +344,7 @@ export const Header: React.FC<HeaderProps> = ({
                   filteredNotifications.map((n) => (
                     <div
                       key={n.id}
-                      onClick={() => handleToggleRead(n.id)}
+                      onClick={() => handleNotificationClick(n)}
                       className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer group ${
                         n.unread ? 'bg-orange-50/25 hover:bg-orange-50/45' : 'hover:bg-slate-50'
                       }`}

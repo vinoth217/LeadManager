@@ -28,6 +28,31 @@ export const EmbedSnippetModal: React.FC<EmbedSnippetModalProps> = ({
   const [position, setPosition] = useState<'right' | 'left'>('right');
   const [copied, setCopied] = useState(false);
   const [activePlatform, setActivePlatform] = useState<'html' | 'wordpress' | 'webflow' | 'react'>('html');
+  const [isTestingTeams, setIsTestingTeams] = useState(false);
+  const [teamsTestResult, setTeamsTestResult] = useState<string | null>(null);
+
+  const handleTestTeams = async () => {
+    setIsTestingTeams(true);
+    setTeamsTestResult(null);
+    try {
+      const res = await fetch('/api/teams/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTeamsTestResult('Test card delivered to Teams channel!');
+      } else {
+        setTeamsTestResult(data.message || 'Failed to send to Teams');
+      }
+    } catch (e: any) {
+      setTeamsTestResult(e.message || 'Error triggering Teams alert');
+    } finally {
+      setIsTestingTeams(false);
+      setTimeout(() => setTeamsTestResult(null), 5000);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -232,6 +257,38 @@ export const EmbedSnippetModal: React.FC<EmbedSnippetModalProps> = ({
                 </p>
               )}
             </div>
+          </div>
+
+          {/* Microsoft Teams Webhook Status Card */}
+          <div className="p-3.5 bg-gradient-to-r from-indigo-50/80 to-purple-50/80 rounded-xl border border-indigo-200/80 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#464EB8] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                T
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <span>Microsoft Teams Real-time Alerts</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded font-semibold">
+                    Connected
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  {teamsTestResult ? (
+                    <span className="text-emerald-700 font-semibold">{teamsTestResult}</span>
+                  ) : (
+                    'Instant Adaptive Cards sent to your Teams channel on new leads & updates'
+                  )}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={handleTestTeams}
+              disabled={isTestingTeams}
+              className="px-3 py-1.5 bg-white hover:bg-slate-50 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold shadow-2xs transition-all disabled:opacity-50 shrink-0"
+            >
+              {isTestingTeams ? 'Sending...' : 'Send Test Ping'}
+            </button>
           </div>
         </div>
 

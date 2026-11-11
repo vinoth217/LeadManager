@@ -15,20 +15,20 @@ export async function PATCH(
       return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
     }
 
-    // Check if status, manager, or scheduled call changed and notify Teams (non-blocking)
+    // Check if status, manager, or scheduled call changed and notify Teams (awaited for serverless safety)
     if (existing) {
-      if (body.status && body.status !== existing.status) {
-        sendTeamsLeadAlert(updated, 'STATUS_UPDATE', {
-          previousStatus: existing.status,
-        }).catch((err) => console.error('[TeamsAlert] Failed update alert:', err));
-      } else if (body.manager && body.manager !== existing.manager) {
-        sendTeamsLeadAlert(updated, 'REASSIGNED').catch((err) =>
-          console.error('[TeamsAlert] Failed reassignment alert:', err)
-        );
-      } else if (body.scheduledCall && JSON.stringify(body.scheduledCall) !== JSON.stringify(existing.scheduledCall)) {
-        sendTeamsLeadAlert(updated, 'CALL_SCHEDULED').catch((err) =>
-          console.error('[TeamsAlert] Failed call scheduled alert:', err)
-        );
+      try {
+        if (body.status && body.status !== existing.status) {
+          await sendTeamsLeadAlert(updated, 'STATUS_UPDATE', {
+            previousStatus: existing.status,
+          });
+        } else if (body.manager && body.manager !== existing.manager) {
+          await sendTeamsLeadAlert(updated, 'REASSIGNED');
+        } else if (body.scheduledCall && JSON.stringify(body.scheduledCall) !== JSON.stringify(existing.scheduledCall)) {
+          await sendTeamsLeadAlert(updated, 'CALL_SCHEDULED');
+        }
+      } catch (err) {
+        console.error('[TeamsAlert] Failed update alert:', err);
       }
     }
 

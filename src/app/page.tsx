@@ -185,6 +185,22 @@ export default function App() {
     }
   }, [fetchLeads, isMounted, currentUser]);
 
+  // Real-time polling & auto-sync: keep leads and notifications updated dynamically
+  useEffect(() => {
+    if (!isMounted || !currentUser) return;
+    const interval = setInterval(() => {
+      fetchLeads();
+    }, 5000);
+
+    const onFocus = () => fetchLeads();
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [fetchLeads, isMounted, currentUser]);
+
   // Toggle selection
   const handleToggleSelect = (id: string) => {
     setSelectedIds((prev) =>
@@ -465,6 +481,11 @@ export default function App() {
         <Header
           totalCount={stats.totalCount}
           managers={managers}
+          leads={leads}
+          onSelectLead={(lead) => {
+            setActiveLead(lead);
+            handleTabChange('leads');
+          }}
           onOpenManagersModal={() => setIsManagersModalOpen(true)}
           activeView={activeTab}
           onGenerateLeads={handleGenerateLeads}
