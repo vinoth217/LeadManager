@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { triageLeadWithAI } from '@/lib/gemini';
+import { sendTeamsLeadAlert } from '@/lib/teams';
 import { Lead, LeadSource, LeadStatus } from '@/types';
 
 const corsHeaders = {
@@ -133,6 +134,11 @@ export async function POST(request: Request) {
     };
 
     await db.addLead(newLead);
+
+    // Send instant notification to Microsoft Teams (non-blocking)
+    sendTeamsLeadAlert(newLead, 'NEW_LEAD').catch((err) =>
+      console.error('[TeamsAlert] Failed sending new lead notification:', err)
+    );
 
     return NextResponse.json(
       {
